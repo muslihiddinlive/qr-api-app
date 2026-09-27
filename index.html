@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QR — istagan matnni bir zumda kodga aylantiring</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#10131a;
+    --panel:#171b24;
+    --panel-2:#1e2330;
+    --line:#2a3040;
+    --text:#ecece3;
+    --muted:#9199a8;
+    --accent:#35e0a1;
+    --accent-dim:#1f8a63;
+    --warn:#f2b84b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-padding-top:16px}
+  body{
+    background:
+      radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0) 0 0/28px 28px,
+      var(--ink);
+    color:var(--text);
+    font-family:'Space Grotesk',system-ui,sans-serif;
+    line-height:1.5;
+    min-height:100vh;
+  }
+  code, .mono{font-family:'IBM Plex Mono',monospace}
+  .wrap{max-width:880px;margin:0 auto;padding:56px 24px 96px}
+
+  header{margin-bottom:48px}
+  .eyebrow{color:var(--accent);font-size:0.9rem;font-weight:500;font-family:'IBM Plex Mono',monospace}
+  h1{
+    font-size:clamp(2rem, 4.5vw, 3rem);
+    font-weight:700;
+    letter-spacing:-0.02em;
+    margin-top:10px;
+    max-width:18ch;
+  }
+  .sub{color:var(--muted);max-width:56ch;margin-top:16px;font-size:1.05rem}
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:32px;
+    margin-bottom:32px;
+  }
+
+  .generator{display:grid;grid-template-columns:1.2fr 1fr;gap:32px}
+  @media (max-width:640px){.generator{grid-template-columns:1fr}}
+
+  label{display:block;font-size:0.85rem;color:var(--muted);margin-bottom:6px}
+  input[type=text]{
+    width:100%;background:var(--panel-2);border:1px solid var(--line);
+    color:var(--text);padding:12px 14px;border-radius:8px;font-size:1rem;
+    font-family:'IBM Plex Mono',monospace;
+  }
+  input[type=text]:focus{outline:none;border-color:var(--accent)}
+
+  .row{display:flex;gap:16px;margin-top:16px}
+  .row > div{flex:1}
+  select{
+    width:100%;background:var(--panel-2);border:1px solid var(--line);
+    color:var(--text);padding:10px 12px;border-radius:8px;font-size:0.95rem;
+  }
+
+  .preview{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    background:var(--panel-2);border:1px solid var(--line);border-radius:10px;
+    padding:20px;min-height:220px;
+  }
+  .preview img{width:100%;max-width:200px;border-radius:6px;background:#fff;padding:8px}
+  .preview .placeholder{color:var(--muted);font-size:0.9rem;text-align:center}
+
+  .actions{display:flex;gap:10px;margin-top:18px}
+  button{
+    background:var(--accent);color:#0a0f0c;border:none;
+    padding:12px 20px;border-radius:8px;font-weight:600;font-size:0.95rem;
+    cursor:pointer;font-family:inherit;
+  }
+  button:hover{background:#4bf0b3}
+  button.ghost{background:transparent;border:1px solid var(--line);color:var(--text)}
+  button.ghost:hover{border-color:var(--accent);color:var(--accent)}
+
+  h2{font-size:1.4rem;margin-bottom:14px;font-weight:600}
+  p{color:var(--muted)}
+  .apisec p{margin-bottom:16px}
+
+  pre{
+    background:#0d1016;border:1px solid var(--line);border-radius:10px;
+    padding:18px;overflow-x:auto;font-size:0.85rem;color:#c9d1d9;
+  }
+  pre .k{color:var(--accent)}
+  pre .s{color:var(--warn)}
+
+  .params{width:100%;border-collapse:collapse;margin-top:20px;font-size:0.9rem}
+  .params th,.params td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line)}
+  .params th{color:var(--muted);font-weight:500}
+  .params td:first-child{font-family:'IBM Plex Mono',monospace;color:var(--accent)}
+
+  footer{margin-top:48px;color:var(--muted);font-size:0.85rem}
+  footer a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">/qr</div>
+    <h1>Har qanday matn — bir zumda QR kod</h1>
+    <p class="sub">Sayt ham, API ham ochiq. Pastdagi generator orqali sinab ko'ring, so'ng o'z botingiz yoki saytingizdan bitta so'rov bilan foydalaning — ro'yxatdan o'tish, kalit, cheklov yo'q.</p>
+  </header>
+
+  <section class="card">
+    <div class="generator">
+      <div>
+        <label for="text">Matn yoki havola</label>
+        <input type="text" id="text" placeholder="https://t.me/username" value="https://t.me/username">
+
+        <div class="row">
+          <div>
+            <label for="size">O'lcham</label>
+            <select id="size">
+              <option value="200">200 px</option>
+              <option value="300" selected>300 px</option>
+              <option value="500">500 px</option>
+              <option value="800">800 px</option>
+            </select>
+          </div>
+          <div>
+            <label for="format">Format</label>
+            <select id="format">
+              <option value="png" selected>PNG</option>
+              <option value="svg">SVG</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="generate">QR yaratish</button>
+          <button class="ghost" id="download">Yuklab olish</button>
+        </div>
+      </div>
+
+      <div class="preview" id="preview">
+        <span class="placeholder">QR shu yerda chiqadi</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="card apisec">
+    <h2>API qanday ishlaydi</h2>
+    <p>Bitta GET so'rov — javob to'g'ridan-to'g'ri rasm bo'lib qaytadi. Telegram bot buni <code>sendPhoto</code>ga URL sifatida to'g'ridan-to'g'ri bera oladi.</p>
+
+<pre><span class="k">GET</span> <span id="endpoint-example">https://qr-api.example.workers.dev/qr?text=https://t.me/username&amp;size=300&amp;format=png</span></pre>
+
+    <table class="params">
+      <tr><th>Parametr</th><th>Majburiymi</th><th>Izoh</th></tr>
+      <tr><td>text</td><td>Ha</td><td>QR ichiga yoziladigan matn yoki havola</td></tr>
+      <tr><td>size</td><td>Yo'q</td><td>Piksellarda, 64–1024 (standart: 300)</td></tr>
+      <tr><td>format</td><td>Yo'q</td><td>png yoki svg (standart: png)</td></tr>
+      <tr><td>margin</td><td>Yo'q</td><td>Chetdagi bo'sh joy, 0–10 (standart: 2)</td></tr>
+    </table>
+
+    <p style="margin-top:24px">Telegram bot (Python, aiogram) misoli:</p>
+<pre>await bot.send_photo(
+    chat_id,
+    photo=<span class="s">f"https://qr-api.example.workers.dev/qr?text={link}"</span>
+)</pre>
+  </section>
+
+  <footer>
+    Ochiq API — hech qanday kalit yoki ro'yxatdan o'tish talab qilinmaydi.
+  </footer>
+</div>
+
+<script>
+  // Backend deploy qilingandan keyin shu manzilni o'zgartiring:
+  const API_BASE = 'https://qr-api.muslihiddinlive.workers.dev';
+
+  const textInput = document.getElementById('text');
+  const sizeSelect = document.getElementById('size');
+  const formatSelect = document.getElementById('format');
+  const preview = document.getElementById('preview');
+  const endpointExample = document.getElementById('endpoint-example');
+
+  function buildUrl() {
+    const text = encodeURIComponent(textInput.value || 'salom');
+    const size = sizeSelect.value;
+    const format = formatSelect.value;
+    return `${API_BASE}/qr?text=${text}&size=${size}&format=${format}`;
+  }
+
+  function render() {
+    const url = buildUrl();
+    endpointExample.textContent = url;
+    preview.innerHTML = `<img src="${url}" alt="QR kod">`;
+  }
+
+  document.getElementById('generate').addEventListener('click', render);
+  document.getElementById('download').addEventListener('click', () => {
+    const a = document.createElement('a');
+    a.href = buildUrl();
+    a.download = 'qr.' + formatSelect.value;
+    a.click();
+  });
+
+  render();
+</script>
+</body>
+</html>
