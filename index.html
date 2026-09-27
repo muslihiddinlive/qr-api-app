@@ -142,6 +142,20 @@
           </div>
         </div>
 
+        <label for="logo_url" style="margin-top:16px">Logotip URL (ixtiyoriy)</label>
+        <input type="text" id="logo_url" placeholder="https://.../logo.png">
+
+        <div class="row">
+          <div>
+            <label for="logo_size">Logotip o'lchami</label>
+            <select id="logo_size">
+              <option value="0.15">Kichik (15%)</option>
+              <option value="0.2" selected>O'rta (20%)</option>
+              <option value="0.28">Katta (28%)</option>
+            </select>
+          </div>
+        </div>
+
         <div class="actions">
           <button id="generate">QR yaratish</button>
           <button class="ghost" id="download">Yuklab olish</button>
@@ -166,6 +180,8 @@
       <tr><td>size</td><td>Yo'q</td><td>Piksellarda, 64–1024 (standart: 300)</td></tr>
       <tr><td>format</td><td>Yo'q</td><td>png yoki svg (standart: png)</td></tr>
       <tr><td>margin</td><td>Yo'q</td><td>Chetdagi bo'sh joy, 0–10 (standart: 2)</td></tr>
+      <tr><td>logo_url</td><td>Yo'q</td><td>Markazga qo'yiladigan logotip PNG rasmining ochiq linki</td></tr>
+      <tr><td>logo_size</td><td>Yo'q</td><td>0.1–0.3 oralig'ida, QR o'lchamiga nisbatan (standart: 0.2)</td></tr>
     </table>
 
     <p style="margin-top:24px">Telegram bot (Python, aiogram) misoli:</p>
@@ -187,6 +203,8 @@
   const textInput = document.getElementById('text');
   const sizeSelect = document.getElementById('size');
   const formatSelect = document.getElementById('format');
+  const logoUrlInput = document.getElementById('logo_url');
+  const logoSizeSelect = document.getElementById('logo_size');
   const preview = document.getElementById('preview');
   const endpointExample = document.getElementById('endpoint-example');
 
@@ -194,10 +212,21 @@
     const text = encodeURIComponent(textInput.value || 'salom');
     const size = sizeSelect.value;
     const format = formatSelect.value;
-    return `${API_BASE}/qr?text=${text}&size=${size}&format=${format}`;
+    const logoUrl = logoUrlInput.value.trim();
+    let url = `${API_BASE}/qr?text=${text}&size=${size}&format=${format}`;
+    if (logoUrl) {
+      url += `&logo_url=${encodeURIComponent(logoUrl)}&logo_size=${logoSizeSelect.value}`;
+    }
+    return url;
   }
 
   function render() {
+    const logoUrl = logoUrlInput.value.trim();
+    if (logoUrl && formatSelect.value === 'svg') {
+      preview.innerHTML = `<span class="placeholder">Logotip hozircha faqat PNG formatida ishlaydi. Formatni PNG'ga o'zgartiring.</span>`;
+      endpointExample.textContent = buildUrl();
+      return;
+    }
     const url = buildUrl();
     endpointExample.textContent = url;
     preview.innerHTML = `<img src="${url}" alt="QR kod">`;
